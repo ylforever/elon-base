@@ -1,5 +1,7 @@
 package com.elon.base.service.excel;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,7 +11,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.xssf.eventusermodel.XSSFReader;
+import org.apache.poi.xssf.model.SharedStrings;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 /**
  * Excel读取公共类。
@@ -18,6 +27,8 @@ import org.apache.poi.ss.usermodel.DateUtil;
  * @version 2018年7月7日
  */
 public class ExcelReaderUtil extends ExcelAbstract {
+    private static final Logger LOGGER = LogManager.getLogger(ExcelAbstract.class);
+
     /**
      * 提取列名称的正则表达式
      */
@@ -27,6 +38,100 @@ public class ExcelReaderUtil extends ExcelAbstract {
      * 读取excel的每一行记录。map的key是列号(A、B、C...), value是单元格的值。如果单元格是空，则没有值。
      */
     private List<Map<String, String>> dataList = new ArrayList<>();
+
+    /**
+     * 读取指定名称的sheet页数据
+     *
+     * @param filePath excel文件路径
+     * @param sheetName sheet页名称
+     * @author neo
+     */
+    public void readOneSheetByName(String filePath, String sheetName) {
+        OPCPackage pkg = null;
+        InputStream sheet = null;
+        try {
+            pkg = OPCPackage.open(filePath);
+            XSSFReader r = new XSSFReader(pkg);
+            SharedStrings sst = r.getSharedStringsTable();
+            XMLReader parser = getSheetParser(sst);
+
+            // 根据 rId# 或 rSheet# 查找sheet
+            XSSFReader.SheetIterator iterator = (XSSFReader.SheetIterator)r.getSheetsData();
+            while (iterator.hasNext()) {
+                sheet = iterator.next();
+                String sn = iterator.getSheetName();
+                if (sheetName.equals(sn)) {
+                    break;
+                }
+            }
+
+            if (sheet == null) {
+                LOGGER.error("Invalid sheet name. sheetName:" + sheetName);
+                return;
+            }
+            InputSource sheetSource = new InputSource(sheet);
+            parser.parse(sheetSource);
+        } catch (Exception e1) {
+            LOGGER.error("Read excel fail. filePath:" + filePath);
+        } finally {
+            try {
+                if (sheet != null) {
+                    sheet.close();
+                }
+                if (pkg != null) {
+                    pkg.close();
+                }
+            } catch (Exception e2) {
+                LOGGER.error("Close excel fail. filePath:" + filePath);
+            }
+        }
+    }
+
+    /**
+     * 读取指定ID编码的sheet页数据
+     *
+     * @param filePath excel文件路径
+     * @param sheetId sheet页ID编码, 从1开始
+     * @author neo
+     */
+    public void readOneSheetById(String filePath, int sheetId) {
+        readOneSheet(filePath, "rId" + sheetId);
+    }
+
+    /**
+     * 读取Excel指定sheet页的数据。注意：如果excel的sheet页删除过，sheetNum会发生变化.
+     *
+     * @param filePath 文件路径
+     * @param sheetId sheet页编号. 例如：rId2。
+     */
+    private void readOneSheet(String filePath, String sheetId) {
+        OPCPackage pkg = null;
+        InputStream sheet = null;
+        try {
+            pkg = OPCPackage.open(filePath);
+            XSSFReader r = new XSSFReader(pkg);
+            SharedStrings sst = r.getSharedStringsTable();
+            XMLReader parser = getSheetParser(sst);
+
+            // 根据 rId# 或 rSheet# 查找sheet
+            sheet = r.getSheet(sheetId);
+            InputSource sheetSource = new InputSource(sheet);
+            parser.parse(sheetSource);
+        } catch (Exception e1) {
+            LOGGER.error("Read excel fail. filePath:" + filePath);
+        } finally {
+            try {
+                if (sheet != null) {
+                    sheet.close();
+                }
+                if (pkg != null) {
+                    pkg.close();
+                }
+            } catch (Exception e2) {
+                LOGGER.error("Close excel fail. filePath:" + filePath);
+            }
+        }
+    }
 
     @Override
     public void optRows(int curRow, Map<String, String> rowValueMap) {

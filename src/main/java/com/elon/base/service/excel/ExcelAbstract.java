@@ -1,16 +1,14 @@
 package com.elon.base.service.excel;
 
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.poi.xssf.eventusermodel.XSSFReader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.xssf.model.SharedStrings;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
-import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
@@ -19,10 +17,12 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
  * POI事件驱动读取Excel文件的抽象类。
  *
- * @author  neo.yang
+ * @author neo.yang
  * @version 2023-12-13
  */
-public abstract  class ExcelAbstract extends DefaultHandler {
+public abstract class ExcelAbstract extends DefaultHandler {
+    private static final Logger LOGGER = LogManager.getLogger(ExcelAbstract.class);
+
     private SharedStrings sst;
     private String lastContents;
     private boolean nextIsString;
@@ -38,33 +38,11 @@ public abstract  class ExcelAbstract extends DefaultHandler {
     /**
      * 处理单行数据的回调方法。
      *
-     * @param curRow 当前行号
+     * @param curRow      当前行号
      * @param rowValueMap 当前行的值
      * @throws SQLException
      */
     public abstract void optRows(int curRow, Map<String, String> rowValueMap);
-
-    /**
-     * 读取Excel指定sheet页的数据。注意：如果excel的sheet页删除过，sheetNum会发生变化.
-     *
-     * @param filePath 文件路径
-     * @param sheetNum sheet页编号.从1开始。
-     * @throws Exception
-     */
-    public void readOneSheet(String filePath, int sheetNum) throws Exception {
-        OPCPackage pkg = OPCPackage.open(filePath);
-        XSSFReader r = new XSSFReader(pkg);
-        SharedStrings sst = r.getSharedStringsTable();
-
-        XMLReader parser = getSheetParser(sst);
-
-        // 根据 rId# 或 rSheet# 查找sheet
-        InputStream sheet2 = r.getSheet("rId" + sheetNum);
-        InputSource sheetSource = new InputSource(sheet2);
-        parser.parse(sheetSource);
-        sheet2.close();
-        pkg.close();
-    }
 
     @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
@@ -128,11 +106,12 @@ public abstract  class ExcelAbstract extends DefaultHandler {
 
     /**
      * 获取单个sheet页的xml解析器。
+     *
      * @param sst
      * @return
      * @throws SAXException
      */
-    private XMLReader getSheetParser(SharedStrings sst) throws SAXException {
+    protected XMLReader getSheetParser(SharedStrings sst) throws SAXException {
         XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
         this.sst = sst;
         parser.setContentHandler(this);
