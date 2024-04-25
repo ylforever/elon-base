@@ -26,9 +26,9 @@ public class FileUtil {
     private static final Logger LOGGER = LogManager.getLogger(FileUtil.class);
 
     /**
-     * 获取resource下文件夹中的文件列表
+     * 获取resource下文件夹中的文件名列表
      *
-     * @param folderPath 文件夹路径. 如： dbscript
+     * @param folderPath 文件夹路径. 行对路径. 如： dbscript
      * @return 文件名称列表
      */
     public List<String> getFileListInResource(String folderPath) {
@@ -51,7 +51,7 @@ public class FileUtil {
      * 读取 resource下文件内容
      *
      * @param resourceFilePath resource下文件相对路径. 例如: dbscript/123.sql
-     * @return 文件内容
+     * @return 文件内容列表
      */
     public List<String> readFileInResource(String resourceFilePath) {
         List<String> lines = new ArrayList<>();
