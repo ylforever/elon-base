@@ -15,8 +15,6 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.params.SetParams;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +70,7 @@ public class KafkaConsumerService {
     }
 
     /**
-     * 初始化消费者实例. 订阅消息
+     * 初始化消费者实例. 订阅主题消息
      */
     public void initKafkaConsumer() {
         LOGGER.info("Subscribe message. kafkaServer:{}|kafkaGroupId:{}|maxPollRecords:{}|topics:{}",
@@ -105,8 +103,8 @@ public class KafkaConsumerService {
                     try {
                         handleSingleMessage(jedisClient, record);
                     } catch (Exception e) {
-                        LOGGER.error("Handle message fail. Topic:{}|Partition:{}|Offset:{}|Key:{}|Message:{}",
-                                record.topic(), record.partition(), record.offset(), record.key(), record.value());
+                        LOGGER.error("Handle message fail. Topic:{}|Partition:{}|Offset:{}|Key:{}|value:{}",
+                                record.topic(), record.partition(), record.offset(), record.key(), record.value(), e);
                     }
                 }
 
@@ -116,6 +114,13 @@ public class KafkaConsumerService {
         }
     }
 
+    /**
+     * 处理单个消息.
+     *
+     * @param jedisClient redis客户端接口
+     * @param record kafka消息记录
+     * @author neo
+     */
     private void handleSingleMessage(Jedis jedisClient, ConsumerRecord<String, String> record) {
         TaskBase taskBase = JSON.parseObject(record.value(), TaskBase.class) ;
         if (!handlerMap.containsKey(taskBase.getTaskCode())) {

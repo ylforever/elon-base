@@ -1,6 +1,5 @@
 package com.elon.base.service.kafka;
 
-import com.elon.base.model.TaskBase;
 import lombok.Getter;
 
 /**

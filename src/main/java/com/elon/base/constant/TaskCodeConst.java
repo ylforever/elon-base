@@ -9,4 +9,7 @@ package com.elon.base.constant;
 public class TaskCodeConst {
     // Kafka产品报表模块导出BI报表任务编码
     public static final String KAFKA_REPORT_EXPORT_BI_REPORT = "KAFKA_REPORT_EXPORT_BI_REPORT";
+
+    // 统计字数的任务
+    public static final String KAFKA_WORD_COUNT = "KAFKA_WORD_COUNT";
 }
