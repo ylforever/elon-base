@@ -1,5 +1,7 @@
 package com.elon.base.util;
 
+import java.util.UUID;
+
 /**
  * 字符串处理工具类
  *
@@ -15,5 +17,15 @@ public class StringUtil {
      */
     public static boolean isEmpty(String str) {
         return str == null || str.isEmpty();
+    }
+
+    /**
+     * 生成UUID字符串
+     *
+     * @return UUID
+     */
+    public static String generateUuid(){
+        UUID uuid = UUID.randomUUID();
+        return uuid.toString().replaceAll("-", "");
     }
 }

@@ -45,13 +45,13 @@ public class KafkaConsumerService {
     @Value("${neo.kafka.max.poll.records:1}")
     private int maxPollRecords;
 
-    @Value("${neo.kafka.topics}")
+    @Value("${neo.kafka.topics:}")
     private List<String> topics;
 
     @Value("${neo.redis.ip:}")
     private String redisIp;
 
-    @Value("${neo.redis.port:}")
+    @Value("${neo.redis.port:0}")
     private int redisPort;
 
     // 消费者
@@ -75,6 +75,11 @@ public class KafkaConsumerService {
     public void initKafkaConsumer() {
         LOGGER.info("Subscribe message. kafkaServer:{}|kafkaGroupId:{}|maxPollRecords:{}|topics:{}",
                 kafkaServer, kafkaGroupId, maxPollRecords, topics);
+        if (kafkaServer.isEmpty()) {
+            LOGGER.warn("kafkaServer is empty.");
+            return;
+        }
+
 
         Properties properties = new Properties();
         properties.put("bootstrap.servers", kafkaServer);  // 指定 Broker
