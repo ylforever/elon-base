@@ -21,4 +21,14 @@ public interface IErrorCode {
      * 操作部分成功
      */
     String OPERATE_PART_SUCCESS = "OPERATE_PART_SUCCESS";
+
+    /**
+     * Token已过期
+     */
+    String TOKEN_EXPIRED = "TOKEN_EXPIRED";
+
+    /**
+     * Token无效
+     */
+    String TOKEN_INVALID = "TOKEN_INVALID";
 }

@@ -1,5 +1,7 @@
 package com.elon.base.util;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.UUID;
 
 /**
@@ -27,5 +29,20 @@ public class StringUtil {
     public static String generateUuid(){
         UUID uuid = UUID.randomUUID();
         return uuid.toString().replaceAll("-", "");
+    }
+
+    /**
+     * 生成6位的随机数
+     *
+     * @return 6位随机数
+     */
+    public static int generateSixDigitRandom() {
+        try {
+            SecureRandom secureRandom = SecureRandom.getInstanceStrong();
+            return  secureRandom.nextInt(999999) + 100000;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 }
