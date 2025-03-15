@@ -10,9 +10,6 @@ import java.util.List;
  * @since 20220-08-26
  */
 public class ListUtil {
-    public static void main(String[] args) {
-
-    }
     /**
      * 判断列表是否为空
      *

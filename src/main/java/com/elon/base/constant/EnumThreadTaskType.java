@@ -5,5 +5,8 @@ package com.elon.base.constant;
  */
 public enum EnumThreadTaskType {
     // 发送email任务类型
-    SEND_EMAIL_TYPE;
+    SEND_EMAIL_TYPE,
+
+    // 生成报告
+    GENERATE_REPORT;
 }
