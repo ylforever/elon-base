@@ -18,6 +18,9 @@ import java.util.Map;
  * @since 2025-02-27
  */
 public class JWTUtil {
+    // 加密密钥。在程序启动后初始化
+    private String secret = "";
+
     private JWTUtil(){
 
     }
@@ -27,10 +30,23 @@ public class JWTUtil {
     }
 
     /**
+     * 设置加密密钥
+     *
+     * @param secret 密钥
+     * @author neo
+     * @since 2025/3/25
+     */
+    public void setSecret(String secret){
+        this.secret = secret;
+    }
+
+    /**
      * 创建Token
      *
      * @param parameterMap 参数表
-     * @return 新建的Token
+     * @return 生成的Token
+     * @author neo
+     * @since 2025/3/25
      */
     public String createToken(Map<String, String> parameterMap){
         Calendar calendar = Calendar.getInstance();
@@ -52,7 +68,7 @@ public class JWTUtil {
         }
 
         // 创建token
-        String token = builder.withExpiresAt(calendar.getTime()).sign(Algorithm.HMAC256("neo"));
+        String token = builder.withExpiresAt(calendar.getTime()).sign(Algorithm.HMAC256(secret));
 
         return token;
     }
@@ -64,7 +80,7 @@ public class JWTUtil {
      * @return 校验结果
      */
     public DecodedJWT verifyJWT(String token){
-        JWTVerifier verifier = JWT.require(Algorithm.HMAC256("neo")).build();
+        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret)).build();
         return verifier.verify(token);
     }
 

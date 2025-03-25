@@ -39,7 +39,7 @@ public class StringUtil {
     public static int generateSixDigitRandom() {
         try {
             SecureRandom secureRandom = SecureRandom.getInstanceStrong();
-            return  secureRandom.nextInt(999999) + 100000;
+            return secureRandom.nextInt(899999) + 100000;
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return -1;
